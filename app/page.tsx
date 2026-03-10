@@ -33,7 +33,6 @@ export default function Home() {
     simple: { background: "#fafafa", color: "#000" }
   };
 
-  // Auto load saved resume
   useEffect(() => {
     const saved = localStorage.getItem("resumeData");
     if (saved) {
@@ -41,7 +40,6 @@ export default function Home() {
     }
   }, []);
 
-  // Auto save
   useEffect(() => {
     localStorage.setItem("resumeData", JSON.stringify(resume));
   }, [resume]);
@@ -50,20 +48,24 @@ export default function Home() {
     try {
       const result = await signInWithPopup(auth, provider);
       setUser(result.user);
-    } catch (e) {
+    } catch (err) {
+      console.log(err);
       alert("Login failed");
     }
   };
 
   const handleChange = (e) => {
-    setResume({ ...resume, [e.target.name]: e.target.value });
+    setResume({
+      ...resume,
+      [e.target.name]: e.target.value
+    });
   };
 
   const generateProfile = () => {
     setResume({
       ...resume,
       profile:
-        "Motivated and detail-oriented individual with strong problem-solving ability seeking opportunities to contribute technical and creative skills in a professional environment."
+        "Motivated and detail-oriented individual with strong problem-solving ability seeking opportunities to contribute technical and creative skills."
     });
   };
 
@@ -71,31 +73,40 @@ export default function Home() {
     setResume({
       ...resume,
       skills:
-        "Communication, Teamwork, Leadership, Problem Solving, Time Management, Adaptability"
+        "Communication, Leadership, Teamwork, Problem Solving, Time Management"
     });
   };
 
   const downloadPDF = async () => {
+
     const element = document.getElementById("resume-preview");
+
+    if (!element) return;
+
     const canvas = await html2canvas(element);
+
     const img = canvas.toDataURL("image/png");
 
     const pdf = new jsPDF();
+
     pdf.addImage(img, "PNG", 10, 10, 180, 0);
+
     pdf.save("resume.pdf");
   };
 
   if (!user) {
     return (
-      <div style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        background: "linear-gradient(180deg,#001f2f,#003b46,#000)",
-        color: "white"
-      }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          background: "linear-gradient(180deg,#001f2f,#003b46,#000)",
+          color: "white"
+        }}
+      >
         <h1>AI Resume Builder</h1>
 
         <button
@@ -118,7 +129,7 @@ export default function Home() {
   return (
     <div style={{ padding: "40px", fontFamily: "Arial" }}>
 
-      <h2>Welcome {user.displayName}</h2>
+      <h2>Welcome {user?.displayName}</h2>
 
       <h3>Resume Dashboard</h3>
 
@@ -141,15 +152,20 @@ export default function Home() {
       <br />
 
       <textarea name="declaration" placeholder="Declaration" onChange={handleChange} />
-      <br /><br />
-
-      <button onClick={generateProfile}>AI Generate Profile</button>
-
-      <button onClick={suggestSkills}>AI Suggest Skills</button>
 
       <br /><br />
 
-      <label>Choose Template:</label>
+      <button onClick={generateProfile}>
+        AI Generate Profile
+      </button>
+
+      <button onClick={suggestSkills}>
+        AI Suggest Skills
+      </button>
+
+      <br /><br />
+
+      <label>Select Template:</label>
 
       <select onChange={(e) => setTemplate(e.target.value)}>
         <option value="modern">Modern</option>
@@ -162,7 +178,9 @@ export default function Home() {
         <option value="simple">Simple</option>
       </select>
 
-      <button onClick={downloadPDF}>Download PDF</button>
+      <button onClick={downloadPDF}>
+        Download PDF
+      </button>
 
       <hr />
 
@@ -175,7 +193,6 @@ export default function Home() {
           ...templates[template]
         }}
       >
-
         <h1>{resume.name}</h1>
 
         <h3>Profile</h3>
@@ -195,7 +212,6 @@ export default function Home() {
 
         <h3>Declaration</h3>
         <p>{resume.declaration}</p>
-
       </div>
 
     </div>
